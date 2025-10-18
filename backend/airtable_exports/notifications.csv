@@ -1,0 +1,5 @@
+id,user_id,type,title,message,link,read,created_at
+1,1,system,"Welcome to SkillBridge!","Start your learning journey by exploring our courses and tasks.",/learner/courses,0,"2025-10-12 10:11:30.026739"
+2,1,course,"New Course Available","Check out our new Full Stack Web Development course!",/learner/courses,0,"2025-10-12 10:11:30.026744"
+3,1,task,"New Tasks Posted","5 new tasks match your skills. Apply now!",/learner/tasks,0,"2025-10-12 10:11:30.026746"
+4,1,task,"Application Accepted!","Your application for Sales Data Analysis Dashboard has been accepted. Start working on it!",/learner/applications,0,"2025-10-12 10:11:30.027404"

@@ -1,0 +1,210 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model applications {
+  id               Int                  @id @default(autoincrement())
+  task_id          Int
+  learner_id       Int
+  status           String?
+  cover_letter     String?
+  submission_url   String?
+  submission_files Unsupported("json")?
+  submission_notes String?
+  applied_at       DateTime?
+  accepted_at      DateTime?
+  submitted_at     DateTime?
+  completed_at     DateTime?
+  learners         learners             @relation(fields: [learner_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tasks            tasks                @relation(fields: [task_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  evaluations      evaluations?
+
+  @@unique([learner_id, task_id], map: "sqlite_autoindex_applications_1")
+}
+
+model certificates {
+  id                Int       @id @default(autoincrement())
+  learner_id        Int
+  course_id         Int
+  verification_code String    @unique(map: "sqlite_autoindex_certificates_2")
+  certificate_url   String?
+  issued_at         DateTime?
+  courses           courses   @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  learners          learners  @relation(fields: [learner_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([learner_id, course_id], map: "sqlite_autoindex_certificates_1")
+}
+
+model companies {
+  id           Int     @id @default(autoincrement())
+  user_id      Int     @unique(map: "sqlite_autoindex_companies_1")
+  company_name String
+  industry     String?
+  description  String?
+  website      String?
+  location     String?
+  size         String?
+  users        users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tasks        tasks[]
+}
+
+model courses {
+  id                  Int                  @id @default(autoincrement())
+  title               String
+  description         String
+  category            String
+  difficulty          String
+  duration            Int?
+  thumbnail           String?
+  status              String?
+  prerequisites       Unsupported("json")?
+  learning_objectives Unsupported("json")?
+  supervisor_id       Int
+  created_at          DateTime?
+  updated_at          DateTime?
+  certificates        certificates[]
+  supervisors         supervisors          @relation(fields: [supervisor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  enrollments         enrollments[]
+  modules             modules[]
+}
+
+model enrollments {
+  id                    Int                  @id @default(autoincrement())
+  learner_id            Int
+  course_id             Int
+  status                String?
+  progress              Unsupported("json")?
+  completion_percentage Float?
+  enrolled_at           DateTime?
+  completed_at          DateTime?
+  courses               courses              @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  learners              learners             @relation(fields: [learner_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([learner_id, course_id], map: "sqlite_autoindex_enrollments_1")
+}
+
+model evaluations {
+  id             Int          @id @default(autoincrement())
+  application_id Int          @unique(map: "sqlite_autoindex_evaluations_1")
+  evaluator_id   Int?
+  rating         Float
+  feedback       String?
+  strengths      String?
+  improvements   String?
+  is_outstanding Boolean?
+  evaluated_at   DateTime?
+  supervisors    supervisors? @relation(fields: [evaluator_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  applications   applications @relation(fields: [application_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model learners {
+  id                Int                  @id @default(autoincrement())
+  user_id           Int                  @unique(map: "sqlite_autoindex_learners_1")
+  skills            Unsupported("json")?
+  bio               String?
+  portfolio_privacy String?
+  phone             String?
+  location          String?
+  education         Unsupported("json")?
+  experience        Unsupported("json")?
+  applications      applications[]
+  certificates      certificates[]
+  enrollments       enrollments[]
+  users             users                @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model messages {
+  id                                Int       @id @default(autoincrement())
+  sender_id                         Int
+  receiver_id                       Int
+  subject                           String?
+  content                           String
+  read                              Boolean?
+  read_at                           DateTime?
+  created_at                        DateTime?
+  users_messages_receiver_idTousers users     @relation("messages_receiver_idTousers", fields: [receiver_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_messages_sender_idTousers   users     @relation("messages_sender_idTousers", fields: [sender_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model modules {
+  id           Int                  @id @default(autoincrement())
+  course_id    Int
+  title        String
+  description  String?
+  content_type String
+  content_url  String?
+  content_data Unsupported("json")?
+  order        Int
+  duration     Int?
+  is_preview   Boolean?
+  created_at   DateTime?
+  courses      courses              @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model notifications {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  type       String
+  title      String
+  message    String
+  link       String?
+  read       Boolean?
+  created_at DateTime?
+  users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model supervisors {
+  id              Int                  @id @default(autoincrement())
+  user_id         Int                  @unique(map: "sqlite_autoindex_supervisors_1")
+  specialization  String?
+  affiliation     String?
+  bio             String?
+  expertise_areas Unsupported("json")?
+  courses         courses[]
+  evaluations     evaluations[]
+  users           users                @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model tasks {
+  id              Int                  @id @default(autoincrement())
+  company_id      Int
+  title           String
+  description     String
+  category        String
+  difficulty      String
+  skills_required Unsupported("json")?
+  estimated_hours Int?
+  deadline        DateTime?
+  status          String?
+  requirements    String?
+  deliverables    String?
+  max_applicants  Int?
+  created_at      DateTime?
+  updated_at      DateTime?
+  applications    applications[]
+  companies       companies            @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model users {
+  id                                   Int             @id @default(autoincrement())
+  email                                String          @unique(map: "ix_users_email")
+  password_hash                        String
+  role                                 String
+  name                                 String
+  profile_picture                      String?
+  is_active                            Boolean?
+  created_at                           DateTime?
+  updated_at                           DateTime?
+  companies                            companies?
+  learners                             learners?
+  messages_messages_receiver_idTousers messages[]      @relation("messages_receiver_idTousers")
+  messages_messages_sender_idTousers   messages[]      @relation("messages_sender_idTousers")
+  notifications                        notifications[]
+  supervisors                          supervisors?
+}

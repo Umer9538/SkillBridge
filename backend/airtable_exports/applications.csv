@@ -1,0 +1,7 @@
+id,task_id,learner_id,status,cover_letter,submission_url,submission_files,submission_notes,applied_at,accepted_at,submitted_at,completed_at
+1,1,1,pending,"I am excited to work on this landing page project. I have 2 years of experience with React and Tailwind CSS, and have built several responsive websites. I can start immediately and deliver within the deadline.",,[],,"2025-10-12 10:11:30.022555",,,
+2,3,1,accepted,"I have strong experience in data analysis using Python and Pandas. I have worked on similar sales analysis projects and can provide valuable insights from your data.",,[],,"2025-10-12 10:11:30.022558",,,
+3,2,1,submitted,"I have integrated payment APIs in multiple projects using Node.js. I am familiar with Stripe and PayPal integrations.",https://github.com/learner/payment-integration,[],"Implemented secure payment integration with Stripe API. All test cases are passing. Documentation included in the README.","2025-10-12 10:11:30.022560",,"2025-10-10 10:11:30.021281",
+4,5,1,completed,"I am a UX/UI designer with 3 years of experience. I have designed multiple mobile apps and have a strong portfolio.",https://www.figma.com/file/mobile-fitness-app,[],"Complete UI/UX design for the fitness tracking app with interactive prototype.","2025-10-12 10:11:30.022561",,"2025-10-02 10:11:30.021349",
+5,4,1,in_progress,"I have a background in statistics and machine learning. I can analyze customer behavior and provide actionable recommendations.",,[],,"2025-10-12 10:11:30.022563",,,
+6,1,3,pending,Ajdbcjbnc,,[],,"2025-10-12 14:20:43.670073",,,

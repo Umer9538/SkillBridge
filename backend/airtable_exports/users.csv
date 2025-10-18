@@ -1,0 +1,9 @@
+id,email,name,role,profile_picture,is_active,created_at
+1,learner@skillbridge.com,"Alice Johnson",learner,,1,"2025-10-12 10:11:28.302320"
+2,john@example.com,"John Doe",learner,,1,"2025-10-12 10:11:28.574253"
+3,company@techcorp.com,"Sarah Smith",company,,1,"2025-10-12 10:11:28.892183"
+4,hr@datainc.com,"Mike Chen",company,,1,"2025-10-12 10:11:29.166796"
+5,supervisor@university.edu,"Dr. Emily Brown",supervisor,,1,"2025-10-12 10:11:29.441823"
+6,prof.davis@mit.edu,"Prof. David Davis",supervisor,,1,"2025-10-12 10:11:29.712908"
+7,admin@skillbridge.com,"Admin User",admin,,1,"2025-10-12 10:11:29.987489"
+8,ahmedmubshar@gmail.com,Ahmad,learner,,1,"2025-10-12 14:19:24.806116"
