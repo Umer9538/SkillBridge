@@ -116,7 +116,7 @@ const CompanyHome = () => {
               </div>
             </div>
             <button
-              onClick={() => navigate('/company/tasks')}
+              onClick={() => navigate('/company/tasks/new')}
               className="bg-white text-primary px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center gap-2 shadow-lg"
             >
               <Plus size={20} />
@@ -273,7 +273,7 @@ const CompanyHome = () => {
                     <Briefcase size={48} className="mx-auto text-gray-300 mb-4" />
                     <p className="text-gray-600 mb-4">No tasks posted yet</p>
                     <button
-                      onClick={() => navigate('/company/tasks')}
+                      onClick={() => navigate('/company/tasks/new')}
                       className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-600"
                     >
                       Post Your First Task

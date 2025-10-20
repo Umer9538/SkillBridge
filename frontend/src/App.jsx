@@ -20,6 +20,7 @@ import PortfolioPage from './pages/learner/Portfolio'
 // Company pages
 import CompanyHome from './pages/company/Home'
 import TaskManagement from './pages/company/TaskManagement'
+import PostTask from './pages/company/PostTask'
 import ApplicantsPage from './pages/company/Applicants'
 
 // Supervisor pages
@@ -69,9 +70,9 @@ function App() {
               <Route index element={<Navigate to="/company/home" replace />} />
               <Route path="home" element={<CompanyHome />} />
               <Route path="tasks" element={<TaskManagement />} />
+              <Route path="tasks/new" element={<PostTask />} />
               <Route path="applicants" element={<ApplicantsPage />} />
             </Route>
-
             {/* Supervisor routes */}
             <Route path="/supervisor" element={<ProtectedRoute allowedRoles={['supervisor']} />}>
               <Route index element={<Navigate to="/supervisor/home" replace />} />
