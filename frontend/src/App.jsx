@@ -29,6 +29,8 @@ import CompanyProfile from './pages/company/Profile'
 import SupervisorHome from './pages/supervisor/Home'
 import CourseManagement from './pages/supervisor/CourseManagement'
 import Evaluations from './pages/supervisor/Evaluations'
+import SupervisorAnalytics from './pages/supervisor/Analytics'
+import SupervisorProfile from './pages/supervisor/Profile'
 
 // Admin pages
 import AdminHome from './pages/admin/Home'
@@ -83,6 +85,8 @@ function App() {
               <Route path="home" element={<SupervisorHome />} />
               <Route path="courses" element={<CourseManagement />} />
               <Route path="evaluations" element={<Evaluations />} />
+              <Route path="analytics" element={<SupervisorAnalytics />} />
+              <Route path="profile" element={<SupervisorProfile />} />
             </Route>
 
             {/* Admin routes */}

@@ -46,9 +46,11 @@ const Layout = ({ children }) => {
         ]
       case 'supervisor':
         return [
-          { name: 'Home', path: '/supervisor/home', icon: Home },
+          { name: 'Dashboard', path: '/supervisor/home', icon: Home },
           { name: 'Courses', path: '/supervisor/courses', icon: BookOpen },
           { name: 'Evaluations', path: '/supervisor/evaluations', icon: FileText },
+          { name: 'Analytics', path: '/supervisor/analytics', icon: BarChart },
+          { name: 'Profile', path: '/supervisor/profile', icon: UserCog },
         ]
       case 'admin':
         return [
