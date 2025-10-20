@@ -36,6 +36,10 @@ import SupervisorProfile from './pages/supervisor/Profile'
 import AdminHome from './pages/admin/Home'
 import UserManagement from './pages/admin/UserManagement'
 import UserSessions from './pages/admin/UserSessions'
+import AdminAnalytics from './pages/admin/Analytics'
+import ContentManagement from './pages/admin/ContentManagement'
+import SystemSettings from './pages/admin/SystemSettings'
+import AdminProfile from './pages/admin/Profile'
 
 // Common pages
 import NotificationsPage from './pages/common/Notifications'
@@ -95,6 +99,10 @@ function App() {
               <Route path="home" element={<AdminHome />} />
               <Route path="users" element={<UserManagement />} />
               <Route path="sessions" element={<UserSessions />} />
+              <Route path="analytics" element={<AdminAnalytics />} />
+              <Route path="content" element={<ContentManagement />} />
+              <Route path="settings" element={<SystemSettings />} />
+              <Route path="profile" element={<AdminProfile />} />
             </Route>
 
             {/* Common protected routes */}

@@ -54,9 +54,13 @@ const Layout = ({ children }) => {
         ]
       case 'admin':
         return [
-          { name: 'Home', path: '/admin/home', icon: Home },
+          { name: 'Dashboard', path: '/admin/home', icon: Home },
           { name: 'Users', path: '/admin/users', icon: Users },
           { name: 'User Sessions', path: '/admin/sessions', icon: UserCog },
+          { name: 'Analytics', path: '/admin/analytics', icon: BarChart },
+          { name: 'Content', path: '/admin/content', icon: FileText },
+          { name: 'Settings', path: '/admin/settings', icon: Settings },
+          { name: 'Profile', path: '/admin/profile', icon: UserCog },
         ]
       default:
         return []
