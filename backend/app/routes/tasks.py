@@ -33,6 +33,27 @@ def get_tasks():
         return jsonify({'message': f'Failed to get tasks: {str(e)}'}), 500
 
 
+@bp.route('/my', methods=['GET'])
+@jwt_required()
+@role_required('company')
+def get_my_tasks():
+    """Get tasks posted by current company (alias for /api/companies/tasks)"""
+    try:
+        user = get_current_user()
+
+        if not hasattr(user, 'company') or not user.company:
+            return jsonify({'message': 'Only companies can access their tasks'}), 403
+
+        tasks = Task.query.filter_by(company_id=user.company.id).all()
+
+        return jsonify({
+            'tasks': [task.to_dict() for task in tasks]
+        }), 200
+
+    except Exception as e:
+        return jsonify({'message': f'Failed to get tasks: {str(e)}'}), 500
+
+
 @bp.route('/<int:task_id>', methods=['GET'])
 @jwt_required()
 def get_task(task_id):
@@ -150,3 +171,83 @@ def submit_work(app_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': f'Submission failed: {str(e)}'}), 500
+
+
+@bp.route('/<int:task_id>', methods=['PUT'])
+@jwt_required()
+@role_required('company')
+def update_task(task_id):
+    """Update a task (company only)"""
+    try:
+        user = get_current_user()
+        task = Task.query.get(task_id)
+
+        if not task:
+            return jsonify({'message': 'Task not found'}), 404
+
+        if not hasattr(user, 'company') or task.company_id != user.company.id:
+            return jsonify({'message': 'Unauthorized'}), 403
+
+        data = request.get_json()
+
+        # Update fields
+        if 'title' in data:
+            task.title = data['title']
+        if 'description' in data:
+            task.description = data['description']
+        if 'category' in data:
+            task.category = data['category']
+        if 'difficulty' in data:
+            task.difficulty = data['difficulty']
+        if 'skills_required' in data:
+            task.skills_required = data['skills_required']
+        if 'estimated_hours' in data:
+            task.estimated_hours = data['estimated_hours']
+        if 'deadline' in data:
+            task.deadline = datetime.fromisoformat(data['deadline']) if data['deadline'] else None
+        if 'status' in data:
+            task.status = data['status']
+        if 'requirements' in data:
+            task.requirements = data['requirements']
+        if 'deliverables' in data:
+            task.deliverables = data['deliverables']
+
+        db.session.commit()
+
+        return jsonify({
+            'message': 'Task updated successfully',
+            'task': task.to_dict()
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Failed to update task: {str(e)}'}), 500
+
+
+@bp.route('/<int:task_id>', methods=['DELETE'])
+@jwt_required()
+@role_required('company')
+def delete_task(task_id):
+    """Delete a task (company only)"""
+    try:
+        user = get_current_user()
+        task = Task.query.get(task_id)
+
+        if not task:
+            return jsonify({'message': 'Task not found'}), 404
+
+        if not hasattr(user, 'company') or task.company_id != user.company.id:
+            return jsonify({'message': 'Unauthorized'}), 403
+
+        # Check if task has applications
+        if task.applications.count() > 0:
+            return jsonify({'message': 'Cannot delete task with existing applications. Please close the task instead.'}), 400
+
+        db.session.delete(task)
+        db.session.commit()
+
+        return jsonify({'message': 'Task deleted successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Failed to delete task: {str(e)}'}), 500

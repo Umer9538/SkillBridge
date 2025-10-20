@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import Layout from '../../components/common/Layout'
+import ReviewsSection from '../../components/reviews/ReviewsSection'
 import api from '../../utils/api'
 import { Clock, BarChart, BookOpen, User, CheckCircle, PlayCircle, Award, Star, Mail } from 'lucide-react'
 
@@ -237,13 +238,7 @@ const CourseDetailPage = () => {
                 {activeTab === 'reviews' && (
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 mb-4">Student Reviews</h3>
-                    <div className="text-center py-8">
-                      <Star size={48} className="mx-auto text-gray-300 mb-3" />
-                      <p className="text-gray-500">No reviews yet</p>
-                      <p className="text-sm text-gray-400 mt-1">
-                        Be the first to review this course
-                      </p>
-                    </div>
+                    <ReviewsSection courseId={id} />
                   </div>
                 )}
               </div>

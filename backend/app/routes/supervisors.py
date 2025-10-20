@@ -156,6 +156,32 @@ def update_course(course_id):
         return jsonify({'message': f'Failed to update course: {str(e)}'}), 500
 
 
+@bp.route('/courses/<int:course_id>', methods=['DELETE'])
+@jwt_required()
+@role_required('supervisor')
+def delete_course(course_id):
+    """Delete a course"""
+    try:
+        user = get_current_user()
+        course = Course.query.get(course_id)
+
+        if not course or course.supervisor_id != user.supervisor.id:
+            return jsonify({'message': 'Course not found'}), 404
+
+        # Check if course has enrollments
+        if course.enrollments.count() > 0:
+            return jsonify({'message': 'Cannot delete course with active enrollments. Please archive it instead by setting status to "archived".'}), 400
+
+        db.session.delete(course)
+        db.session.commit()
+
+        return jsonify({'message': 'Course deleted successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Failed to delete course: {str(e)}'}), 500
+
+
 @bp.route('/courses/<int:course_id>/modules', methods=['POST'])
 @jwt_required()
 @role_required('supervisor')
@@ -197,6 +223,80 @@ def create_module(course_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': f'Failed to create module: {str(e)}'}), 500
+
+
+@bp.route('/modules/<int:module_id>', methods=['PUT'])
+@jwt_required()
+@role_required('supervisor')
+def update_module(module_id):
+    """Update a module"""
+    try:
+        user = get_current_user()
+        module = Module.query.get(module_id)
+
+        if not module:
+            return jsonify({'message': 'Module not found'}), 404
+
+        # Check if supervisor owns the course
+        if module.course.supervisor_id != user.supervisor.id:
+            return jsonify({'message': 'Unauthorized'}), 403
+
+        data = request.get_json()
+
+        # Update fields
+        if 'title' in data:
+            module.title = data['title']
+        if 'description' in data:
+            module.description = data['description']
+        if 'content_type' in data:
+            module.content_type = data['content_type']
+        if 'content_url' in data:
+            module.content_url = data['content_url']
+        if 'content_data' in data:
+            module.content_data = data['content_data']
+        if 'order' in data:
+            module.order = data['order']
+        if 'duration' in data:
+            module.duration = data['duration']
+        if 'is_preview' in data:
+            module.is_preview = data['is_preview']
+
+        db.session.commit()
+
+        return jsonify({
+            'message': 'Module updated successfully',
+            'module': module.to_dict()
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Failed to update module: {str(e)}'}), 500
+
+
+@bp.route('/modules/<int:module_id>', methods=['DELETE'])
+@jwt_required()
+@role_required('supervisor')
+def delete_module(module_id):
+    """Delete a module"""
+    try:
+        user = get_current_user()
+        module = Module.query.get(module_id)
+
+        if not module:
+            return jsonify({'message': 'Module not found'}), 404
+
+        # Check if supervisor owns the course
+        if module.course.supervisor_id != user.supervisor.id:
+            return jsonify({'message': 'Unauthorized'}), 403
+
+        db.session.delete(module)
+        db.session.commit()
+
+        return jsonify({'message': 'Module deleted successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Failed to delete module: {str(e)}'}), 500
 
 
 @bp.route('/evaluations', methods=['GET'])

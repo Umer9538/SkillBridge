@@ -29,7 +29,7 @@ def create_app(config_name='default'):
     CORS(app, origins=app.config['CORS_ORIGINS'], supports_credentials=True)
 
     # Register blueprints
-    from app.routes import auth, learners, companies, supervisors, admin, courses, tasks, notifications, upload, reviews, analytics
+    from app.routes import auth, learners, companies, supervisors, admin, courses, tasks, notifications, upload, reviews, analytics, messages
 
     app.register_blueprint(auth.bp)
     app.register_blueprint(learners.bp)
@@ -39,6 +39,7 @@ def create_app(config_name='default'):
     app.register_blueprint(courses.bp)
     app.register_blueprint(tasks.bp)
     app.register_blueprint(notifications.bp)
+    app.register_blueprint(messages.bp)
     app.register_blueprint(upload.upload_bp, url_prefix='/api')
     app.register_blueprint(reviews.reviews_bp, url_prefix='/api')
     app.register_blueprint(analytics.analytics_bp)

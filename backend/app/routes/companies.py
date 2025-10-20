@@ -247,3 +247,120 @@ def get_statistics():
 
     except Exception as e:
         return jsonify({'message': f'Failed to get statistics: {str(e)}'}), 500
+
+
+@bp.route('/applications', methods=['GET'])
+@jwt_required()
+@role_required('company')
+def get_all_applications():
+    """Get all applications across all company tasks"""
+    try:
+        user = get_current_user()
+
+        # Get all applications for all tasks posted by this company
+        applications = Application.query.join(Task).filter(
+            Task.company_id == user.company.id
+        ).all()
+
+        return jsonify({
+            'applications': [app.to_dict(include_task=True, include_evaluation=True) for app in applications]
+        }), 200
+
+    except Exception as e:
+        return jsonify({'message': f'Failed to get applications: {str(e)}'}), 500
+
+
+@bp.route('/applications/<int:app_id>/accept', methods=['PUT'])
+@jwt_required()
+@role_required('company')
+def accept_application(app_id):
+    """Accept an application"""
+    try:
+        user = get_current_user()
+        application = Application.query.get(app_id)
+
+        if not application or application.task.company_id != user.company.id:
+            return jsonify({'message': 'Application not found'}), 404
+
+        application.status = 'accepted'
+        db.session.commit()
+
+        # Send email notification to learner
+        try:
+            from app.utils.email_service import send_application_status_email
+            from app.models import User
+            learner = User.query.get(application.learner_id)
+            if learner:
+                send_application_status_email(learner, application.task, 'accepted', user)
+        except Exception as e:
+            print(f"Failed to send email notification: {str(e)}")
+
+        return jsonify({
+            'message': 'Application accepted successfully',
+            'application': application.to_dict()
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Failed to accept application: {str(e)}'}), 500
+
+
+@bp.route('/applications/<int:app_id>/reject', methods=['PUT'])
+@jwt_required()
+@role_required('company')
+def reject_application(app_id):
+    """Reject an application"""
+    try:
+        user = get_current_user()
+        application = Application.query.get(app_id)
+
+        if not application or application.task.company_id != user.company.id:
+            return jsonify({'message': 'Application not found'}), 404
+
+        application.status = 'rejected'
+        db.session.commit()
+
+        # Send email notification to learner
+        try:
+            from app.utils.email_service import send_application_status_email
+            from app.models import User
+            learner = User.query.get(application.learner_id)
+            if learner:
+                send_application_status_email(learner, application.task, 'rejected', user)
+        except Exception as e:
+            print(f"Failed to send email notification: {str(e)}")
+
+        return jsonify({
+            'message': 'Application rejected successfully',
+            'application': application.to_dict()
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Failed to reject application: {str(e)}'}), 500
+
+
+@bp.route('/tasks/<int:task_id>', methods=['DELETE'])
+@jwt_required()
+@role_required('company')
+def delete_task(task_id):
+    """Delete a task"""
+    try:
+        user = get_current_user()
+        task = Task.query.get(task_id)
+
+        if not task or task.company_id != user.company.id:
+            return jsonify({'message': 'Task not found'}), 404
+
+        # Check if task has applications
+        if task.applications.count() > 0:
+            return jsonify({'message': 'Cannot delete task with existing applications. Please close the task instead.'}), 400
+
+        db.session.delete(task)
+        db.session.commit()
+
+        return jsonify({'message': 'Task deleted successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Failed to delete task: {str(e)}'}), 500

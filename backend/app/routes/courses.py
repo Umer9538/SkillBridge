@@ -105,6 +105,41 @@ def get_my_enrollments():
         return jsonify({'message': f'Failed to get enrollments: {str(e)}'}), 500
 
 
+@bp.route('/<int:course_id>/enrollments', methods=['GET'])
+@jwt_required()
+def get_course_enrollments(course_id):
+    """Get all enrollments for a specific course (for supervisor/admin)"""
+    try:
+        user = get_current_user()
+        course = Course.query.get(course_id)
+
+        if not course:
+            return jsonify({'message': 'Course not found'}), 404
+
+        # Check authorization - only supervisor who created course or admin can see enrollments
+        if user.role == 'supervisor':
+            if not hasattr(user, 'supervisor') or course.supervisor_id != user.supervisor.id:
+                return jsonify({'message': 'Unauthorized'}), 403
+        elif user.role != 'admin':
+            return jsonify({'message': 'Unauthorized'}), 403
+
+        enrollments = Enrollment.query.filter_by(course_id=course_id).all()
+
+        # Enrich enrollment data with learner details
+        enrollment_data = []
+        for enrollment in enrollments:
+            data = enrollment.to_dict()
+            if enrollment.learner and enrollment.learner.user:
+                data['learner_name'] = enrollment.learner.user.name
+                data['learner_email'] = enrollment.learner.user.email
+            enrollment_data.append(data)
+
+        return jsonify({'enrollments': enrollment_data}), 200
+
+    except Exception as e:
+        return jsonify({'message': f'Failed to get enrollments: {str(e)}'}), 500
+
+
 @bp.route('/enrollments/<int:enrollment_id>/progress', methods=['PUT'])
 @jwt_required()
 @role_required('learner')

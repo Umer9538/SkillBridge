@@ -141,6 +141,28 @@ def get_all_courses():
         return jsonify({'message': f'Failed to get courses: {str(e)}'}), 500
 
 
+@bp.route('/courses/<int:course_id>', methods=['DELETE'])
+@jwt_required()
+@role_required('admin')
+def delete_course(course_id):
+    """Delete a course (admin only)"""
+    try:
+        course = Course.query.get(course_id)
+
+        if not course:
+            return jsonify({'message': 'Course not found'}), 404
+
+        # Admin can force delete even with enrollments (use with caution)
+        db.session.delete(course)
+        db.session.commit()
+
+        return jsonify({'message': 'Course deleted successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Failed to delete course: {str(e)}'}), 500
+
+
 @bp.route('/tasks', methods=['GET'])
 @jwt_required()
 @role_required('admin')
