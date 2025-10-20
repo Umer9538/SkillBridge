@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import Layout from '../../components/common/Layout'
-import api from '../../services/api'
+import api from '../../utils/api'
 import { BookOpen, Users, TrendingUp, Award, Search } from 'lucide-react'
 
 const Evaluations = () => {
