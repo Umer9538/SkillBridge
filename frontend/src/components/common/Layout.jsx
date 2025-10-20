@@ -15,7 +15,8 @@ import {
   Award,
   Users,
   BarChart,
-  FileText
+  FileText,
+  UserCog
 } from 'lucide-react'
 
 const Layout = ({ children }) => {
@@ -51,7 +52,7 @@ const Layout = ({ children }) => {
         return [
           { name: 'Home', path: '/admin/home', icon: Home },
           { name: 'Users', path: '/admin/users', icon: Users },
-          { name: 'Analytics', path: '/admin/analytics', icon: BarChart },
+          { name: 'User Sessions', path: '/admin/sessions', icon: UserCog },
         ]
       default:
         return []

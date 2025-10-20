@@ -2,6 +2,9 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from app import db
 from app.models import User, Learner, Company, Supervisor
+from app.utils.email_service import send_welcome_email, send_password_reset_email
+import secrets
+from datetime import datetime, timedelta
 
 bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
@@ -21,10 +24,12 @@ def register():
         if User.query.filter_by(email=data['email']).first():
             return jsonify({'message': 'Email already registered'}), 400
 
-        # Validate role
-        valid_roles = ['learner', 'company', 'supervisor', 'admin']
+        # Validate role - admin can only be created by existing admins
+        valid_roles = ['learner', 'company', 'supervisor']
         if data['role'] not in valid_roles:
-            return jsonify({'message': 'Invalid role'}), 400
+            if data['role'] == 'admin':
+                return jsonify({'message': 'Admin accounts cannot be created through public registration. Please contact an administrator.'}), 403
+            return jsonify({'message': 'Invalid role. Please select Learner, Company, or Supervisor.'}), 400
 
         # Create user
         user = User(
@@ -51,6 +56,12 @@ def register():
             db.session.add(supervisor)
 
         db.session.commit()
+
+        # Send welcome email
+        try:
+            send_welcome_email(user)
+        except Exception as e:
+            print(f"Failed to send welcome email: {str(e)}")
 
         # Create tokens
         access_token = create_access_token(identity=user.id)
@@ -154,3 +165,93 @@ def change_password():
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': f'Failed to change password: {str(e)}'}), 500
+
+
+@bp.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    """Request password reset"""
+    try:
+        data = request.get_json()
+
+        if not data.get('email'):
+            return jsonify({'message': 'Email is required'}), 400
+
+        user = User.query.filter_by(email=data['email']).first()
+
+        # Always return success message to prevent email enumeration
+        if not user:
+            return jsonify({'message': 'If the email exists, a password reset link has been sent'}), 200
+
+        # Generate reset token
+        reset_token = secrets.token_urlsafe(32)
+        user.reset_token = reset_token
+        user.reset_token_expiry = datetime.utcnow() + timedelta(hours=1)
+        db.session.commit()
+
+        # Send password reset email
+        try:
+            send_password_reset_email(user, reset_token)
+        except Exception as e:
+            print(f"Failed to send password reset email: {str(e)}")
+
+        return jsonify({'message': 'If the email exists, a password reset link has been sent'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Failed to process request: {str(e)}'}), 500
+
+
+@bp.route('/reset-password', methods=['POST'])
+def reset_password():
+    """Reset password with token"""
+    try:
+        data = request.get_json()
+
+        if not data.get('token') or not data.get('new_password'):
+            return jsonify({'message': 'Token and new password are required'}), 400
+
+        user = User.query.filter_by(reset_token=data['token']).first()
+
+        if not user:
+            return jsonify({'message': 'Invalid or expired reset token'}), 400
+
+        # Check if token has expired
+        if not user.reset_token_expiry or user.reset_token_expiry < datetime.utcnow():
+            return jsonify({'message': 'Reset token has expired'}), 400
+
+        # Update password
+        from app import bcrypt
+        user.password_hash = bcrypt.generate_password_hash(data['new_password']).decode('utf-8')
+        user.reset_token = None
+        user.reset_token_expiry = None
+        db.session.commit()
+
+        return jsonify({'message': 'Password reset successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Failed to reset password: {str(e)}'}), 500
+
+
+@bp.route('/verify-reset-token', methods=['POST'])
+def verify_reset_token():
+    """Verify if reset token is valid"""
+    try:
+        data = request.get_json()
+
+        if not data.get('token'):
+            return jsonify({'message': 'Token is required'}), 400
+
+        user = User.query.filter_by(reset_token=data['token']).first()
+
+        if not user:
+            return jsonify({'valid': False, 'message': 'Invalid reset token'}), 200
+
+        # Check if token has expired
+        if not user.reset_token_expiry or user.reset_token_expiry < datetime.utcnow():
+            return jsonify({'valid': False, 'message': 'Reset token has expired'}), 200
+
+        return jsonify({'valid': True, 'message': 'Token is valid'}), 200
+
+    except Exception as e:
+        return jsonify({'valid': False, 'message': f'Failed to verify token: {str(e)}'}), 500

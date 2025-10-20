@@ -29,7 +29,7 @@ def create_app(config_name='default'):
     CORS(app, origins=app.config['CORS_ORIGINS'], supports_credentials=True)
 
     # Register blueprints
-    from app.routes import auth, learners, companies, supervisors, admin, courses, tasks, notifications, upload, reviews
+    from app.routes import auth, learners, companies, supervisors, admin, courses, tasks, notifications, upload, reviews, analytics
 
     app.register_blueprint(auth.bp)
     app.register_blueprint(learners.bp)
@@ -41,6 +41,7 @@ def create_app(config_name='default'):
     app.register_blueprint(notifications.bp)
     app.register_blueprint(upload.upload_bp, url_prefix='/api')
     app.register_blueprint(reviews.reviews_bp, url_prefix='/api')
+    app.register_blueprint(analytics.analytics_bp)
 
     # Create upload folder if it doesn't exist
     import os

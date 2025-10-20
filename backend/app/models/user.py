@@ -13,6 +13,8 @@ class User(db.Model):
     name = db.Column(db.String(100), nullable=False)
     profile_picture = db.Column(db.String(255), nullable=True)
     is_active = db.Column(db.Boolean, default=True)
+    reset_token = db.Column(db.String(255), nullable=True)
+    reset_token_expiry = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

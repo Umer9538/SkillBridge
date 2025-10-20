@@ -67,21 +67,55 @@ const RegisterPage = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
-              I am a...
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              I want to join as...
             </label>
-            <select
-              id="role"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-            >
-              <option value="learner">Learner</option>
-              <option value="company">Company</option>
-              <option value="supervisor">Supervisor</option>
-            </select>
+            <div className="space-y-2">
+              <label className={`flex items-start p-4 border-2 rounded-lg cursor-pointer transition-all ${formData.role === 'learner' ? 'border-primary bg-primary-50' : 'border-gray-200 hover:border-primary-300'}`}>
+                <input
+                  type="radio"
+                  name="role"
+                  value="learner"
+                  checked={formData.role === 'learner'}
+                  onChange={handleChange}
+                  className="mt-1 mr-3"
+                />
+                <div>
+                  <div className="font-semibold text-gray-900">Learner</div>
+                  <div className="text-sm text-gray-600">Learn new skills, enroll in courses, and apply for real-world tasks</div>
+                </div>
+              </label>
+
+              <label className={`flex items-start p-4 border-2 rounded-lg cursor-pointer transition-all ${formData.role === 'company' ? 'border-primary bg-primary-50' : 'border-gray-200 hover:border-primary-300'}`}>
+                <input
+                  type="radio"
+                  name="role"
+                  value="company"
+                  checked={formData.role === 'company'}
+                  onChange={handleChange}
+                  className="mt-1 mr-3"
+                />
+                <div>
+                  <div className="font-semibold text-gray-900">Company</div>
+                  <div className="text-sm text-gray-600">Post tasks and hire talented learners for your projects</div>
+                </div>
+              </label>
+
+              <label className={`flex items-start p-4 border-2 rounded-lg cursor-pointer transition-all ${formData.role === 'supervisor' ? 'border-primary bg-primary-50' : 'border-gray-200 hover:border-primary-300'}`}>
+                <input
+                  type="radio"
+                  name="role"
+                  value="supervisor"
+                  checked={formData.role === 'supervisor'}
+                  onChange={handleChange}
+                  className="mt-1 mr-3"
+                />
+                <div>
+                  <div className="font-semibold text-gray-900">Supervisor</div>
+                  <div className="text-sm text-gray-600">Create and manage courses, add learning content and modules</div>
+                </div>
+              </label>
+            </div>
           </div>
 
           <div>

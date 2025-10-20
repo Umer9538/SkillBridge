@@ -5,6 +5,8 @@ import { NotificationProvider } from './contexts/NotificationContext'
 // Auth pages
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 
 // Learner pages
 import LearnerHome from './pages/learner/Home'
@@ -28,6 +30,7 @@ import Evaluations from './pages/supervisor/Evaluations'
 // Admin pages
 import AdminHome from './pages/admin/Home'
 import UserManagement from './pages/admin/UserManagement'
+import UserSessions from './pages/admin/UserSessions'
 
 // Common pages
 import NotificationsPage from './pages/common/Notifications'
@@ -46,6 +49,8 @@ function App() {
             {/* Public routes */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
             {/* Learner routes */}
             <Route path="/learner" element={<ProtectedRoute allowedRoles={['learner']} />}>
@@ -80,6 +85,7 @@ function App() {
               <Route index element={<Navigate to="/admin/home" replace />} />
               <Route path="home" element={<AdminHome />} />
               <Route path="users" element={<UserManagement />} />
+              <Route path="sessions" element={<UserSessions />} />
             </Route>
 
             {/* Common protected routes */}
