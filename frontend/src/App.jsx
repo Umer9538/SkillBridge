@@ -22,6 +22,8 @@ import CompanyHome from './pages/company/Home'
 import TaskManagement from './pages/company/TaskManagement'
 import PostTask from './pages/company/PostTask'
 import ApplicantsPage from './pages/company/Applicants'
+import CompanyAnalytics from './pages/company/Analytics'
+import CompanyProfile from './pages/company/Profile'
 
 // Supervisor pages
 import SupervisorHome from './pages/supervisor/Home'
@@ -72,6 +74,8 @@ function App() {
               <Route path="tasks" element={<TaskManagement />} />
               <Route path="tasks/new" element={<PostTask />} />
               <Route path="applicants" element={<ApplicantsPage />} />
+              <Route path="analytics" element={<CompanyAnalytics />} />
+              <Route path="profile" element={<CompanyProfile />} />
             </Route>
             {/* Supervisor routes */}
             <Route path="/supervisor" element={<ProtectedRoute allowedRoles={['supervisor']} />}>
