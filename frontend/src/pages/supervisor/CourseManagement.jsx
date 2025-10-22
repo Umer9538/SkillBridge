@@ -135,7 +135,7 @@ const CourseManagement = () => {
     <Layout>
       <div>
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Course Management</h1>
             <p className="text-gray-600">Create and manage your courses</p>

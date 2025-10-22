@@ -123,7 +123,7 @@ const SupervisorAnalytics = () => {
         </div>
 
         {/* Date Range Selector */}
-        <div className="mb-6 flex gap-2">
+        <div className="mb-6 flex gap-2 flex-wrap">
           {['7days', '30days', '90days', 'all'].map((range) => (
             <button
               key={range}

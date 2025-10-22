@@ -85,10 +85,10 @@ const Layout = ({ children }) => {
               <h1 className="text-2xl font-bold text-primary ml-2">SkillBridge</h1>
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center md:space-x-4">
               <button
                 onClick={() => navigate('/notifications')}
-                className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
+                className="relative p-1.5 sm:p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
               >
                 <Bell size={20} />
                 {unreadCount > 0 && (
@@ -100,14 +100,14 @@ const Layout = ({ children }) => {
 
               <button
                 onClick={() => navigate('/messages')}
-                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
+                className="p-1.5 sm:p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
               >
                 <Mail size={20} />
               </button>
 
               <button
                 onClick={() => navigate('/settings')}
-                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
+                className="p-1.5 sm:p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
               >
                 <Settings size={20} />
               </button>
@@ -120,13 +120,13 @@ const Layout = ({ children }) => {
                 <img
                   src={user?.profile_picture || `https://ui-avatars.com/api/?name=${user?.name}&background=2563EB&color=fff`}
                   alt={user?.name}
-                  className="h-10 w-10 rounded-full"
+                  className="h-10 w-10 rounded-full hidden sm:block"
                 />
               </div>
 
               <button
                 onClick={logout}
-                className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-full"
+                className="p-1.5 sm:p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-full"
                 title="Logout"
               >
                 <LogOut size={20} />

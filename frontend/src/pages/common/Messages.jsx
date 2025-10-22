@@ -4,9 +4,53 @@ import api from '../../utils/api'
 import { MessageSquare, Send, Search, X } from 'lucide-react'
 
 const MessagesPage = () => {
-  const [conversations, setConversations] = useState([])
-  const [selectedConversation, setSelectedConversation] = useState(null)
-  const [messages, setMessages] = useState([])
+  const [conversations, setConversations] = useState([ {
+    user_id: 2,
+    user_name: 'Jane Doe',
+    user_profile_picture: 'https://i.pravatar.cc/100?img=5',
+    user_role: 'admin',
+    unread_count: 2,
+    last_message: {
+      content: 'Sure, I’ll get back to you soon!',
+      created_at: '2025-10-21T15:23:00Z',
+    },
+  },])
+  const [selectedConversation, setSelectedConversation] = useState({
+  user_id: 2,
+  user_name: 'Jane Doe',
+  user_profile_picture: 'https://i.pravatar.cc/100?img=5',
+  user_role: 'admin',
+  messages: [] // optional here
+})
+  const [messages, setMessages] = useState([ {
+    id: 1,
+    sender_id: 1, // current user
+    receiver_id: 2,
+    content: 'Hi Jane, are you available for a quick call?',
+    created_at: '2025-10-21T15:15:00Z',
+  },
+  {
+    id: 2,
+    sender_id: 2,
+    receiver_id: 1,
+    content: 'Sure, I’ll get back to you soon!',
+    created_at: '2025-10-21T15:23:00Z',
+  },
+   {
+    id: 1,
+    sender_id: 1, // current user
+    receiver_id: 2,
+    content: 'Hi Jane, are you available for a quick call?',
+    created_at: '2025-10-21T15:15:00Z',
+  },
+  {
+    id: 2,
+    sender_id: 2,
+    receiver_id: 1,
+    content: 'Sure, I’ll get back to you soon!',
+    created_at: '2025-10-21T15:23:00Z',
+  },
+])
   const [newMessage, setNewMessage] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
@@ -101,10 +145,9 @@ const MessagesPage = () => {
       <div>
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Messages</h1>
 
-        <div className="bg-white rounded-lg shadow h-[calc(100vh-12rem)] flex">
+        <div className="bg-white rounded-lg shadow h-[calc(100vh-12rem)] flex flex-col lg:flex-row">
           {/* Conversations List */}
-          <div className="w-1/3 border-r border-gray-200 flex flex-col">
-            {/* Search */}
+          <div className={`${selectedConversation ? 'hidden' : 'flex'} lg:flex w-full lg:w-1/3 flex-col border-r border-gray-200`}>
             <div className="p-4 border-b border-gray-200">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -183,7 +226,7 @@ const MessagesPage = () => {
           </div>
 
           {/* Message Thread */}
-          <div className="flex-1 flex flex-col">
+          <div className={`${selectedConversation ? 'flex' : 'hidden'} lg:flex flex-1 flex-col h-full`}>
             {selectedConversation ? (
               <>
                 {/* Conversation Header */}
@@ -251,22 +294,22 @@ const MessagesPage = () => {
 
                 {/* Send Message Form */}
                 <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-200">
-                  <div className="flex space-x-3">
+                  <div className="flex space-x-1 sm:space-x-3">
                     <input
                       type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       placeholder="Type a message..."
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="flex-1 px-1 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       disabled={sending}
                     />
                     <button
                       type="submit"
                       disabled={sending || !newMessage.trim()}
-                      className="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-2"
+                      className="px-3 sm:px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-2"
                     >
                       <Send size={18} />
-                      <span>{sending ? 'Sending...' : 'Send'}</span>
+                      <span className='hidden sm:block'>{sending ? 'Sending...' : 'Send'}</span>
                     </button>
                   </div>
                 </form>

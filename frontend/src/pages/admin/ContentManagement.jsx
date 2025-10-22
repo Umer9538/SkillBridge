@@ -127,7 +127,7 @@ const ContentManagement = () => {
                 setSearchTerm('')
                 setStatusFilter('all')
               }}
-              className={`pb-4 px-4 font-medium transition-colors flex items-center gap-2 ${
+              className={`pb-4 px-2 sm:px-4 font-medium transition-colors flex items-center gap-2 ${
                 activeTab === 'courses'
                   ? 'text-primary border-b-2 border-primary'
                   : 'text-gray-600 hover:text-gray-900'
@@ -142,7 +142,7 @@ const ContentManagement = () => {
                 setSearchTerm('')
                 setStatusFilter('all')
               }}
-              className={`pb-4 px-4 font-medium transition-colors flex items-center gap-2 ${
+              className={`pb-4 px-2 sm:px-4 font-medium transition-colors flex items-center gap-2 ${
                 activeTab === 'tasks'
                   ? 'text-primary border-b-2 border-primary'
                   : 'text-gray-600 hover:text-gray-900'

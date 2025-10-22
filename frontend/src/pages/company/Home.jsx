@@ -101,7 +101,7 @@ const CompanyHome = () => {
       <div>
         {/* Welcome Banner */}
         <div className="bg-gradient-to-r from-primary to-blue-600 rounded-xl shadow-lg p-8 mb-6 text-white">
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between flex-wrap gap-4">
             <div className="flex items-start gap-4">
               <div className="p-3 bg-white/20 rounded-lg backdrop-blur-sm">
                 <Building2 size={32} className="text-white" />

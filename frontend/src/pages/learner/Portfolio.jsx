@@ -77,12 +77,12 @@ const PortfolioPage = () => {
     <Layout>
       <div className="max-w-5xl mx-auto">
         {/* Header Actions */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-8 flex-wrap gap-3">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">My Portfolio</h1>
             <p className="text-gray-600">Showcase your skills and achievements</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
             <button
               onClick={togglePrivacy}
               className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
@@ -106,7 +106,7 @@ const PortfolioPage = () => {
             <img
               src={user?.profile_picture || `https://ui-avatars.com/api/?name=${user?.name}&size=128&background=2563EB&color=fff`}
               alt={user?.name}
-              className="w-32 h-32 rounded-full"
+              className="sm:w-32 sm:h-32 w-16 h-16 rounded-full"
             />
             <div className="flex-1">
               <h2 className="text-3xl font-bold text-gray-900 mb-2">{user?.name}</h2>

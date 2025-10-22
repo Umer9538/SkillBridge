@@ -96,7 +96,7 @@ const CompanyProfile = () => {
     <Layout>
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Company Profile</h1>
             <p className="text-gray-600">Manage your company information</p>
