@@ -32,6 +32,45 @@ def get_tasks():
     except Exception as e:
         return jsonify({'message': f'Failed to get tasks: {str(e)}'}), 500
 
+@bp.route('', methods=['POST'])
+@jwt_required()
+@role_required('company')
+def create_tasks():
+    """Create the new tasks"""
+    try:
+        user = get_current_user()
+        data = request.get_data()
+
+        required_fields = ['title', 'description', 'category', 'difficulty']
+        if not all(field in data for field in required_fields):
+            return jsonify({'message': 'Missing required fields'}), 400
+        
+        task = Task(
+            company_id=user.company.id,
+            title=data["title"],
+            description=data["description"],
+            category=data["category"],
+            difficulty=data['difficulty'],
+            skills_required=data["skills_required"],
+            estimated_hours=data["estimated_hours"],
+            deadline=data["deadline"],
+            requirements=data["requirements"],
+            deliverables=data["deliverables"],
+            max_applicants=data["max_applicants"],
+            compensation=data["compensation"],
+        )
+        
+        db.session.add(task)
+        db.session.commit()
+
+        return jsonify({
+            'message': 'task created successfully',
+            'task': task.to_dict()
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Failed to create task: {str(e)}'}), 500
 
 @bp.route('/my', methods=['GET'])
 @jwt_required()

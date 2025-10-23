@@ -274,7 +274,7 @@ def get_engagement_metrics():
     # Calculate engagement rates
     total_learners = User.query.filter_by(role='learner').count()
     learners_with_enrollments = db.session.query(
-        func.count(func.distinct(Enrollment.user_id))
+        func.count(func.distinct(Enrollment.id))
     ).scalar() or 0
 
     enrollment_rate = (learners_with_enrollments / total_learners * 100) if total_learners > 0 else 0
@@ -289,7 +289,7 @@ def get_engagement_metrics():
     avg_enrollments = db.session.query(
         func.avg(
             db.session.query(func.count(Enrollment.id))
-            .filter(Enrollment.user_id == User.id)
+            .filter(Enrollment.id == User.id)
             .scalar_subquery()
         )
     ).filter(User.role == 'learner').scalar() or 0

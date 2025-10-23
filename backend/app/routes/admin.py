@@ -161,6 +161,36 @@ def delete_course(course_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': f'Failed to delete course: {str(e)}'}), 500
+    
+@bp.route('/courses/<int:course_id>/status', methods=['PUT'])
+@jwt_required()
+@role_required('admin')
+def update_course_status(course_id):
+    """Update the course status (admin only)"""
+    # Get the new status from the request
+    status = request.get_json().get("status")
+
+    if not status:
+        return jsonify({'message': 'Status is required'}), 400
+
+    try:
+        # Fetch the course by ID
+        course = Course.query.get(course_id)
+
+        # Check if the course exists
+        if not course:
+            return jsonify({'message': 'Course not found'}), 404
+
+        # Update the course's status
+        course.status = status
+        db.session.commit()  # Commit the changes
+
+        return jsonify({'message': f'Course status updated successfully for {course.title}'}), 200
+
+    except Exception as e:
+        db.session.rollback()  # Rollback in case of an error
+        return jsonify({'message': f'Failed to update course status: {str(e)}'}), 500
+
 
 
 @bp.route('/tasks', methods=['GET'])
