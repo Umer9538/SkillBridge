@@ -4,6 +4,7 @@ import Layout from '../../components/common/Layout'
 import { useAuth } from '../../contexts/AuthContext'
 import api from '../../utils/api'
 import { Send, Clock, DollarSign, MapPin } from 'lucide-react'
+import CourseRecommendations from '../../components/ai/CourseRecommendations'
 
 const LearnerHome = () => {
   const { user } = useAuth()
@@ -198,6 +199,11 @@ const LearnerHome = () => {
               </div>
             )}
           </div>
+        </div>
+
+        {/* AI-Powered Recommendations */}
+        <div className="mt-8">
+          <CourseRecommendations limit={5} />
         </div>
       </div>
     </Layout>
