@@ -6,9 +6,8 @@ Handles AI-powered features: recommendations, matching, evaluations
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models.user import User
-from app.models.task import Task
+from app.models.task import Task, Application
 from app.models.course import Course
-from app.models.application import Application
 from app.utils.ai_service import AIService
 from app import db
 
