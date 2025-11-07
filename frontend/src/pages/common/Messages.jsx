@@ -4,53 +4,9 @@ import api from '../../utils/api'
 import { MessageSquare, Send, Search, X } from 'lucide-react'
 
 const MessagesPage = () => {
-  const [conversations, setConversations] = useState([ {
-    user_id: 2,
-    user_name: 'Jane Doe',
-    user_profile_picture: 'https://i.pravatar.cc/100?img=5',
-    user_role: 'admin',
-    unread_count: 2,
-    last_message: {
-      content: 'Sure, I’ll get back to you soon!',
-      created_at: '2025-10-21T15:23:00Z',
-    },
-  },])
-  const [selectedConversation, setSelectedConversation] = useState({
-  user_id: 2,
-  user_name: 'Jane Doe',
-  user_profile_picture: 'https://i.pravatar.cc/100?img=5',
-  user_role: 'admin',
-  messages: [] // optional here
-})
-  const [messages, setMessages] = useState([ {
-    id: 1,
-    sender_id: 1, // current user
-    receiver_id: 2,
-    content: 'Hi Jane, are you available for a quick call?',
-    created_at: '2025-10-21T15:15:00Z',
-  },
-  {
-    id: 2,
-    sender_id: 2,
-    receiver_id: 1,
-    content: 'Sure, I’ll get back to you soon!',
-    created_at: '2025-10-21T15:23:00Z',
-  },
-   {
-    id: 1,
-    sender_id: 1, // current user
-    receiver_id: 2,
-    content: 'Hi Jane, are you available for a quick call?',
-    created_at: '2025-10-21T15:15:00Z',
-  },
-  {
-    id: 2,
-    sender_id: 2,
-    receiver_id: 1,
-    content: 'Sure, I’ll get back to you soon!',
-    created_at: '2025-10-21T15:23:00Z',
-  },
-])
+  const [conversations, setConversations] = useState([])
+  const [selectedConversation, setSelectedConversation] = useState(null)
+  const [messages, setMessages] = useState([])
   const [newMessage, setNewMessage] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)

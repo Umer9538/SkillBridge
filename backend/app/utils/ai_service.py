@@ -106,6 +106,7 @@ class AIService:
         """
         from app.models.learner import Learner
         from app.models.course import Course, Enrollment
+        from app.models.review import CourseReview
         from app import db
 
         learner = Learner.query.filter_by(user_id=learner_id).first()
