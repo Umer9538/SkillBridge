@@ -135,10 +135,23 @@ start_all.bat
 
 ## 📚 Documentation
 
-- **START_HERE.md** - Quick start guide ⭐
-- **QUICKSTART.md** - Quick reference
-- **USER_REGISTRATION_GUIDE.md** - Registration guide
-- **AUTHENTICATION_TESTING_GUIDE.md** - Testing guide
+### 🚀 Getting Started
+- **[QUICK_SETUP.md](QUICK_SETUP.md)** - 5-minute quick setup guide ⭐
+- **[INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)** - Complete installation instructions
+- **[START_HERE.md](START_HERE.md)** - Beginner's guide
+- **[QUICKSTART.md](QUICKSTART.md)** - Quick reference
+
+### 👥 User Guides
+- **[USER_REGISTRATION_GUIDE.md](USER_REGISTRATION_GUIDE.md)** - Registration flow
+- **[AUTHENTICATION_TESTING_GUIDE.md](AUTHENTICATION_TESTING_GUIDE.md)** - Testing guide
+- **[TEST_CREDENTIALS.md](TEST_CREDENTIALS.md)** - All test accounts
+
+### 🚢 Deployment
+- **[DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)** - Production deployment guide
+
+### 📖 Additional Documentation
+- **[SETUP_AND_RUN.md](SETUP_AND_RUN.md)** - Detailed setup instructions
+- **[RUN_COMMANDS.md](RUN_COMMANDS.md)** - Manual run commands
 
 ---
 
