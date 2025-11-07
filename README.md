@@ -150,6 +150,7 @@ start_all.bat
 - **[DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)** - Production deployment guide
 
 ### 📖 Additional Documentation
+- **[FEATURES.md](FEATURES.md)** - Complete features documentation
 - **[SETUP_AND_RUN.md](SETUP_AND_RUN.md)** - Detailed setup instructions
 - **[RUN_COMMANDS.md](RUN_COMMANDS.md)** - Manual run commands
 
