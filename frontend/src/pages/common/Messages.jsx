@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Layout from '../../components/common/Layout'
 import api from '../../utils/api'
-import { MessageSquare, Send, Search, X } from 'lucide-react'
+import { MessageSquare, Send, Search, X, Plus, Users } from 'lucide-react'
 
 const MessagesPage = () => {
   const [conversations, setConversations] = useState([])
@@ -11,6 +11,10 @@ const MessagesPage = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
+  const [showNewMessageModal, setShowNewMessageModal] = useState(false)
+  const [availableUsers, setAvailableUsers] = useState([])
+  const [userSearchQuery, setUserSearchQuery] = useState('')
+  const [loadingUsers, setLoadingUsers] = useState(false)
 
   useEffect(() => {
     fetchConversations()
@@ -20,12 +24,36 @@ const MessagesPage = () => {
     try {
       setLoading(true)
       const response = await api.get('/messages/conversations')
-      setConversations(response.data.conversations)
+      setConversations(response.data.conversations || [])
     } catch (error) {
       console.error('Failed to fetch conversations:', error)
     } finally {
       setLoading(false)
     }
+  }
+
+  const fetchAvailableUsers = async () => {
+    try {
+      setLoadingUsers(true)
+      const response = await api.get('/messages/users')
+      setAvailableUsers(response.data.users || [])
+    } catch (error) {
+      console.error('Failed to fetch users:', error)
+    } finally {
+      setLoadingUsers(false)
+    }
+  }
+
+  const startNewConversation = (user) => {
+    setSelectedConversation({
+      user_id: user.id,
+      user_name: user.name,
+      user_profile_picture: user.profile_picture,
+      user_role: user.role,
+      messages: []
+    })
+    setMessages([])
+    setShowNewMessageModal(false)
   }
 
   const fetchConversation = async (userId) => {
@@ -104,7 +132,17 @@ const MessagesPage = () => {
         <div className="bg-white rounded-lg shadow h-[calc(100vh-12rem)] flex flex-col lg:flex-row">
           {/* Conversations List */}
           <div className={`${selectedConversation ? 'hidden' : 'flex'} lg:flex w-full lg:w-1/3 flex-col border-r border-gray-200`}>
-            <div className="p-4 border-b border-gray-200">
+            <div className="p-4 border-b border-gray-200 space-y-3">
+              <button
+                onClick={() => {
+                  setShowNewMessageModal(true)
+                  fetchAvailableUsers()
+                }}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium"
+              >
+                <Plus size={20} />
+                New Message
+              </button>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                 <input
@@ -278,6 +316,88 @@ const MessagesPage = () => {
             )}
           </div>
         </div>
+
+        {/* New Message Modal */}
+        {showNewMessageModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[80vh] flex flex-col">
+              <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <Users size={24} />
+                  Start New Conversation
+                </h2>
+                <button
+                  onClick={() => setShowNewMessageModal(false)}
+                  className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="p-4 border-b border-gray-200">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                  <input
+                    type="text"
+                    placeholder="Search users..."
+                    value={userSearchQuery}
+                    onChange={(e) => setUserSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-2">
+                {loadingUsers ? (
+                  <div className="flex items-center justify-center h-32">
+                    <div className="text-gray-500">Loading users...</div>
+                  </div>
+                ) : (
+                  availableUsers
+                    .filter(user =>
+                      user.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
+                      user.email.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
+                      user.role.toLowerCase().includes(userSearchQuery.toLowerCase())
+                    )
+                    .map((user) => (
+                      <div
+                        key={user.id}
+                        onClick={() => startNewConversation(user)}
+                        className="p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex-shrink-0">
+                            {user.profile_picture ? (
+                              <img
+                                src={user.profile_picture}
+                                alt={user.name}
+                                className="w-10 h-10 rounded-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
+                                <span className="text-primary-700 font-semibold">
+                                  {user.name.charAt(0).toUpperCase()}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-gray-900 truncate">
+                              {user.name}
+                            </p>
+                            <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                            <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-700 rounded capitalize">
+                              {user.role}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   )

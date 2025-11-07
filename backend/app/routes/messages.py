@@ -234,3 +234,30 @@ def get_unread_count():
 
     except Exception as e:
         return jsonify({'message': f'Failed to get unread count: {str(e)}'}), 500
+
+
+@bp.route('/users', methods=['GET'])
+@jwt_required()
+def get_available_users():
+    """Get all users available for messaging (excluding current user)"""
+    try:
+        user = get_current_user()
+
+        # Get all active users except current user
+        users = User.query.filter(
+            User.id != user.id,
+            User.is_active == True
+        ).all()
+
+        return jsonify({
+            'users': [{
+                'id': u.id,
+                'name': u.name,
+                'email': u.email,
+                'role': u.role,
+                'profile_picture': u.profile_picture
+            } for u in users]
+        }), 200
+
+    except Exception as e:
+        return jsonify({'message': f'Failed to get users: {str(e)}'}), 500
