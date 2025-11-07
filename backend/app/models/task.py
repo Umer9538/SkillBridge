@@ -80,7 +80,7 @@ class Application(db.Model):
     # Unique constraint: one application per learner per task
     __table_args__ = (db.UniqueConstraint('learner_id', 'task_id', name='unique_application'),)
 
-    def to_dict(self, include_evaluation=False):
+    def to_dict(self, include_evaluation=False, include_task=False):
         """Convert application to dictionary"""
         data = {
             'id': self.id,
@@ -98,6 +98,9 @@ class Application(db.Model):
             'submitted_at': self.submitted_at.isoformat() if self.submitted_at else None,
             'completed_at': self.completed_at.isoformat() if self.completed_at else None
         }
+
+        if include_task and self.task:
+            data['task'] = self.task.to_dict(include_company=False)
 
         if include_evaluation and self.evaluation:
             data['evaluation'] = self.evaluation.to_dict()
