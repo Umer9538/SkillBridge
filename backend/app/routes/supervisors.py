@@ -182,6 +182,28 @@ def delete_course(course_id):
         return jsonify({'message': f'Failed to delete course: {str(e)}'}), 500
 
 
+@bp.route('/courses/<int:course_id>/modules', methods=['GET'])
+@jwt_required()
+@role_required('supervisor')
+def get_course_modules(course_id):
+    """Get all modules for a course"""
+    try:
+        user = get_current_user()
+        course = Course.query.get(course_id)
+
+        if not course or course.supervisor_id != user.supervisor.id:
+            return jsonify({'message': 'Course not found'}), 404
+
+        modules = Module.query.filter_by(course_id=course_id).order_by(Module.order).all()
+
+        return jsonify({
+            'modules': [module.to_dict() for module in modules]
+        }), 200
+
+    except Exception as e:
+        return jsonify({'message': f'Failed to get modules: {str(e)}'}), 500
+
+
 @bp.route('/courses/<int:course_id>/modules', methods=['POST'])
 @jwt_required()
 @role_required('supervisor')
