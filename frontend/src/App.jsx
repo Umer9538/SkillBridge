@@ -28,6 +28,7 @@ import CompanyProfile from './pages/company/Profile'
 // Supervisor pages
 import SupervisorHome from './pages/supervisor/Home'
 import CourseManagement from './pages/supervisor/CourseManagement'
+import ModuleManagement from './pages/supervisor/ModuleManagement'
 import Evaluations from './pages/supervisor/Evaluations'
 import SupervisorAnalytics from './pages/supervisor/Analytics'
 import SupervisorProfile from './pages/supervisor/Profile'
@@ -88,6 +89,7 @@ function App() {
               <Route index element={<Navigate to="/supervisor/home" replace />} />
               <Route path="home" element={<SupervisorHome />} />
               <Route path="courses" element={<CourseManagement />} />
+              <Route path="courses/:courseId/modules" element={<ModuleManagement />} />
               <Route path="evaluations" element={<Evaluations />} />
               <Route path="analytics" element={<SupervisorAnalytics />} />
               <Route path="profile" element={<SupervisorProfile />} />
