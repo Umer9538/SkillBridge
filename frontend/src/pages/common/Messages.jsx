@@ -63,7 +63,7 @@ const MessagesPage = () => {
   const fetchConversations = async () => {
     try {
       setLoading(true)
-      const response = await api.get('/api/messages/conversations')
+      const response = await api.get('/messages/conversations')
       setConversations(response.data.conversations)
     } catch (error) {
       console.error('Failed to fetch conversations:', error)
@@ -74,7 +74,7 @@ const MessagesPage = () => {
 
   const fetchConversation = async (userId) => {
     try {
-      const response = await api.get(`/api/messages/conversations/${userId}`)
+      const response = await api.get(`/messages/conversations/${userId}`)
       setSelectedConversation(response.data.conversation)
       setMessages(response.data.conversation.messages)
 
@@ -98,7 +98,7 @@ const MessagesPage = () => {
 
     try {
       setSending(true)
-      const response = await api.post('/api/messages', {
+      const response = await api.post('/messages', {
         receiver_id: selectedConversation.user_id,
         content: newMessage
       })

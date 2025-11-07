@@ -115,9 +115,8 @@ class AIService:
         # Get courses learner is already enrolled in
         enrolled_course_ids = [e.course_id for e in Enrollment.query.filter_by(learner_id=learner_id).all()]
 
-        # Get learner's skills and interests
+        # Get learner's skills
         learner_skills = learner.skills or []
-        learner_interests = learner.interests or []
 
         # Get completed courses
         completed_courses = db.session.query(Course).join(Enrollment).filter(
@@ -156,12 +155,6 @@ class AIService:
                 if skill.lower() in course_title_lower or skill.lower() in course_desc_lower:
                     score += 20
                     reasons.append(f"Matches your skill: {skill}")
-                    break
-
-            for interest in learner_interests:
-                if interest.lower() in course_title_lower or interest.lower() in course_desc_lower:
-                    score += 15
-                    reasons.append(f"Matches your interest: {interest}")
                     break
 
             # Difficulty progression (suggest intermediate/advanced after beginner)
