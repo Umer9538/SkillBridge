@@ -173,18 +173,25 @@ class AIService:
                 score += 10
                 reasons.append("Popular course")
 
-            # Rating bonus
-            if course.rating and course.rating >= 4.0:
-                score += 10
-                reasons.append("Highly rated")
+            # Rating bonus - calculate from reviews
+            reviews = course.reviews.all()
+            if reviews:
+                avg_rating = sum(r.rating for r in reviews) / len(reviews)
+                if avg_rating >= 4.0:
+                    score += 10
+                    reasons.append("Highly rated")
 
             if score > 0:
+                # Calculate average rating from reviews
+                reviews = course.reviews.all()
+                avg_rating = sum(r.rating for r in reviews) / len(reviews) if reviews else 0
+
                 recommendations.append({
                     'course_id': course.id,
                     'title': course.title,
                     'category': course.category,
                     'difficulty': course.difficulty,
-                    'rating': course.rating or 0,
+                    'rating': round(avg_rating, 1),
                     'thumbnail': course.thumbnail,
                     'recommendation_score': score,
                     'reasons': reasons[:2]  # Top 2 reasons
