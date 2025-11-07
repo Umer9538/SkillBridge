@@ -20,7 +20,7 @@ const ReviewsSection = ({ courseId }) => {
   const fetchReviews = async () => {
     try {
       setLoading(true)
-      const response = await api.get(`/api/courses/${courseId}/reviews`)
+      const response = await api.get(`/courses/${courseId}/reviews`)
       setReviews(response.data.reviews)
       setStatistics(response.data.statistics)
 
@@ -47,7 +47,7 @@ const ReviewsSection = ({ courseId }) => {
 
     try {
       setSubmitting(true)
-      await api.post(`/api/courses/${courseId}/reviews`, {
+      await api.post(`/courses/${courseId}/reviews`, {
         rating,
         review_text: reviewText
       })
@@ -68,7 +68,7 @@ const ReviewsSection = ({ courseId }) => {
     if (!confirm('Are you sure you want to delete your review?')) return
 
     try {
-      await api.delete(`/api/courses/${courseId}/reviews/${reviewId}`)
+      await api.delete(`/courses/${courseId}/reviews/${reviewId}`)
       fetchReviews()
       alert('Review deleted successfully')
     } catch (error) {

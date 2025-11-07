@@ -105,8 +105,7 @@ class AIService:
         - Popular courses in their field
         """
         from app.models.learner import Learner
-        from app.models.course import Course
-        from app.models.enrollment import Enrollment
+        from app.models.course import Course, Enrollment
         from app import db
 
         learner = Learner.query.filter_by(user_id=learner_id).first()
