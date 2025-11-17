@@ -136,7 +136,8 @@ start_all.bat
 ## 📚 Documentation
 
 ### 🚀 Getting Started
-- **[PROJECT_SETUP_GUIDE.md](PROJECT_SETUP_GUIDE.md)** - What you need, what we use, how to setup ⭐
+- **[PREREQUISITES_GUIDE.md](PREREQUISITES_GUIDE.md)** - Everything you need to install (Python, Node.js, all packages) ⭐
+- **[PROJECT_SETUP_GUIDE.md](PROJECT_SETUP_GUIDE.md)** - What you need, what we use, how to setup
 - **[QUICK_SETUP.md](QUICK_SETUP.md)** - 5-minute quick setup guide
 - **[INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)** - Complete installation instructions
 - **[START_HERE.md](START_HERE.md)** - Beginner's guide
