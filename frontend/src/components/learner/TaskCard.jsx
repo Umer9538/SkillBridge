@@ -19,9 +19,8 @@ const TaskCard = ({ task, onApply }) => {
               {task.category}
             </span>
             <span
-              className={`px-2 py-1 text-xs font-semibold rounded ${
-                difficultyColors[task.difficulty] || 'bg-gray-100 text-gray-800'
-              }`}
+              className={`px-2 py-1 text-xs font-semibold rounded ${difficultyColors[task.difficulty] || 'bg-gray-100 text-gray-800'
+                }`}
             >
               {task.difficulty}
             </span>
@@ -36,7 +35,7 @@ const TaskCard = ({ task, onApply }) => {
           </div>
 
           {/* Skills */}
-          {task.skills_required && task.skills_required.length > 0 && (
+          {Array.isArray(task.skills_required) && task.skills_required.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-3">
               {task.skills_required.slice(0, 4).map((skill, index) => (
                 <span
@@ -63,7 +62,7 @@ const TaskCard = ({ task, onApply }) => {
                 <span>{task.estimated_hours}h</span>
               </div>
             )}
-            {task.deadline && (
+            {task.deadline && !isNaN(new Date(task.deadline).getTime()) && (
               <div className="flex items-center">
                 <Calendar size={16} className="mr-1" />
                 <span>{format(new Date(task.deadline), 'MMM dd, yyyy')}</span>

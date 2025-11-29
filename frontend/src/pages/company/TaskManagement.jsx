@@ -91,10 +91,10 @@ const TaskManagement = () => {
       }
 
       if (editingTask) {
-        await api.put(`/tasks/${editingTask.id}`, taskData)
+        await api.put(`/companies/tasks/${editingTask.id}`, taskData)
         alert('Task updated successfully!')
       } else {
-        await api.post('/tasks', taskData)
+        await api.post('/companies/tasks', taskData)
         alert('Task created successfully!')
       }
 
@@ -110,7 +110,7 @@ const TaskManagement = () => {
     if (!confirm('Are you sure you want to delete this task?')) return
 
     try {
-      await api.delete(`/tasks/${taskId}`)
+      await api.delete(`/companies/tasks/${taskId}`)
       alert('Task deleted successfully!')
       fetchTasks()
     } catch (error) {

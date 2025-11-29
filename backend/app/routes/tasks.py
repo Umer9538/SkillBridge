@@ -39,7 +39,7 @@ def create_tasks():
     """Create the new tasks"""
     try:
         user = get_current_user()
-        data = request.get_data()
+        data = request.get_json()
 
         required_fields = ['title', 'description', 'category', 'difficulty']
         if not all(field in data for field in required_fields):
@@ -51,13 +51,12 @@ def create_tasks():
             description=data["description"],
             category=data["category"],
             difficulty=data['difficulty'],
-            skills_required=data["skills_required"],
-            estimated_hours=data["estimated_hours"],
-            deadline=data["deadline"],
-            requirements=data["requirements"],
-            deliverables=data["deliverables"],
-            max_applicants=data["max_applicants"],
-            compensation=data["compensation"],
+            skills_required=data.get("skills_required", []),
+            estimated_hours=data.get("estimated_hours"),
+            deadline=datetime.fromisoformat(data['deadline']) if data.get('deadline') else None,
+            requirements=data.get("requirements"),
+            deliverables=data.get("deliverables"),
+            max_applicants=data.get("max_applicants")
         )
         
         db.session.add(task)
