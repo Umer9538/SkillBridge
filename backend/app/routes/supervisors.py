@@ -95,7 +95,8 @@ def create_course():
             duration=data.get('duration'),
             thumbnail=data.get('thumbnail'),
             prerequisites=data.get('prerequisites', []),
-            learning_objectives=data.get('learning_objectives', [])
+            learning_objectives=data.get('learning_objectives', []),
+            status=data.get('status', 'published')  # Default to published so learners can see it
         )
 
         db.session.add(course)

@@ -151,7 +151,7 @@ const SupervisorHome = () => {
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <button
-            onClick={() => navigate('/supervisor/courses/new')}
+            onClick={() => navigate('/supervisor/courses', { state: { openCreateModal: true } })}
             className="bg-primary text-white rounded-lg p-4 hover:bg-primary-600 transition-colors flex items-center justify-center gap-2 font-medium shadow"
           >
             <Plus size={20} />
@@ -229,7 +229,7 @@ const SupervisorHome = () => {
               <BookOpen className="mx-auto text-gray-300 mb-4" size={48} />
               <p className="text-gray-600 mb-4">You haven't created any courses yet</p>
               <button
-                onClick={() => navigate('/supervisor/courses/new')}
+                onClick={() => navigate('/supervisor/courses', { state: { openCreateModal: true } })}
                 className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-600 inline-flex items-center gap-2"
               >
                 <Plus size={18} />

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import Layout from '../../components/common/Layout'
 import FileUpload from '../../components/common/FileUpload'
 import api from '../../utils/api'
@@ -7,9 +7,10 @@ import { Plus, Edit, Trash2, Eye, BookOpen, Users, X, Save } from 'lucide-react'
 
 const CourseManagement = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(true)
-  const [showModal, setShowModal] = useState(false)
+  const [showModal, setShowModal] = useState(location.state?.openCreateModal || false)
   const [editingCourse, setEditingCourse] = useState(null)
   const [formData, setFormData] = useState({
     title: '',
@@ -19,7 +20,8 @@ const CourseManagement = () => {
     duration: '',
     prerequisites: '',
     learning_objectives: '',
-    thumbnail: ''
+    thumbnail: '',
+    status: 'published'
   })
 
   const categories = ['Programming', 'Data Analysis', 'UX/UI Design', 'Cybersecurity', 'Marketing', 'Business']
@@ -27,6 +29,10 @@ const CourseManagement = () => {
 
   useEffect(() => {
     fetchCourses()
+    // Clear the navigation state after opening modal
+    if (location.state?.openCreateModal) {
+      window.history.replaceState({}, document.title)
+    }
   }, [])
 
   const fetchCourses = async () => {
@@ -85,7 +91,8 @@ const CourseManagement = () => {
       duration: course.duration || '',
       prerequisites: course.prerequisites || '',
       learning_objectives: course.learning_objectives || '',
-      thumbnail: course.thumbnail || ''
+      thumbnail: course.thumbnail || '',
+      status: course.status || 'draft'
     })
     setShowModal(true)
   }
@@ -111,7 +118,8 @@ const CourseManagement = () => {
       duration: '',
       prerequisites: '',
       learning_objectives: '',
-      thumbnail: ''
+      thumbnail: '',
+      status: 'published'
     })
     setEditingCourse(null)
   }
@@ -174,13 +182,22 @@ const CourseManagement = () => {
                       <h3 className="font-bold text-lg text-gray-900 mb-1">{course.title}</h3>
                       <p className="text-sm text-gray-600">{course.category}</p>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      course.difficulty === 'Beginner' ? 'bg-green-100 text-green-700' :
-                      course.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-red-100 text-red-700'
-                    }`}>
-                      {course.difficulty}
-                    </span>
+                    <div className="flex flex-col gap-1 items-end">
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        course.difficulty === 'Beginner' ? 'bg-green-100 text-green-700' :
+                        course.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {course.difficulty}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                        course.status === 'published' ? 'bg-green-100 text-green-700' :
+                        course.status === 'draft' ? 'bg-gray-100 text-gray-600' :
+                        'bg-orange-100 text-orange-700'
+                      }`}>
+                        {course.status || 'draft'}
+                      </span>
+                    </div>
                   </div>
 
                   <p className="text-sm text-gray-600 mb-4 line-clamp-2">
@@ -324,19 +341,36 @@ const CourseManagement = () => {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Duration (hours)
-                  </label>
-                  <input
-                    type="number"
-                    name="duration"
-                    value={formData.duration}
-                    onChange={handleInputChange}
-                    min="1"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    placeholder="Estimated duration in hours"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Duration (hours)
+                    </label>
+                    <input
+                      type="number"
+                      name="duration"
+                      value={formData.duration}
+                      onChange={handleInputChange}
+                      min="1"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="Duration in hours"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Status
+                    </label>
+                    <select
+                      name="status"
+                      value={formData.status}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    >
+                      <option value="published">Published (visible to learners)</option>
+                      <option value="draft">Draft (hidden from learners)</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div>

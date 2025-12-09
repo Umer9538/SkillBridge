@@ -15,7 +15,7 @@ model applications {
   status           String?
   cover_letter     String?
   submission_url   String?
-  submission_files Unsupported("json")?
+  submission_files String?
   submission_notes String?
   applied_at       DateTime?
   accepted_at      DateTime?
@@ -63,12 +63,13 @@ model courses {
   duration            Int?
   thumbnail           String?
   status              String?
-  prerequisites       Unsupported("json")?
-  learning_objectives Unsupported("json")?
+  prerequisites       String?
+  learning_objectives String?
   supervisor_id       Int
   created_at          DateTime?
   updated_at          DateTime?
   certificates        certificates[]
+  course_reviews      course_reviews[]
   supervisors         supervisors          @relation(fields: [supervisor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   enrollments         enrollments[]
   modules             modules[]
@@ -79,7 +80,7 @@ model enrollments {
   learner_id            Int
   course_id             Int
   status                String?
-  progress              Unsupported("json")?
+  progress              String?
   completion_percentage Float?
   enrolled_at           DateTime?
   completed_at          DateTime?
@@ -106,13 +107,13 @@ model evaluations {
 model learners {
   id                Int                  @id @default(autoincrement())
   user_id           Int                  @unique(map: "sqlite_autoindex_learners_1")
-  skills            Unsupported("json")?
+  skills            String?
   bio               String?
   portfolio_privacy String?
   phone             String?
   location          String?
-  education         Unsupported("json")?
-  experience        Unsupported("json")?
+  education         String?
+  experience        String?
   applications      applications[]
   certificates      certificates[]
   enrollments       enrollments[]
@@ -139,7 +140,7 @@ model modules {
   description  String?
   content_type String
   content_url  String?
-  content_data Unsupported("json")?
+  content_data String?
   order        Int
   duration     Int?
   is_preview   Boolean?
@@ -165,7 +166,7 @@ model supervisors {
   specialization  String?
   affiliation     String?
   bio             String?
-  expertise_areas Unsupported("json")?
+  expertise_areas String?
   courses         courses[]
   evaluations     evaluations[]
   users           users                @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -178,7 +179,7 @@ model tasks {
   description     String
   category        String
   difficulty      String
-  skills_required Unsupported("json")?
+  skills_required String?
   estimated_hours Int?
   deadline        DateTime?
   status          String?
@@ -188,12 +189,13 @@ model tasks {
   created_at      DateTime?
   updated_at      DateTime?
   applications    applications[]
+  task_reviews    task_reviews[]
   companies       companies            @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model users {
-  id                                   Int             @id @default(autoincrement())
-  email                                String          @unique(map: "ix_users_email")
+  id                                   Int              @id @default(autoincrement())
+  email                                String           @unique(map: "ix_users_email")
   password_hash                        String
   role                                 String
   name                                 String
@@ -201,10 +203,47 @@ model users {
   is_active                            Boolean?
   created_at                           DateTime?
   updated_at                           DateTime?
+  reset_token                          String?
+  reset_token_expiry                   DateTime?
   companies                            companies?
+  course_reviews                       course_reviews[]
   learners                             learners?
-  messages_messages_receiver_idTousers messages[]      @relation("messages_receiver_idTousers")
-  messages_messages_sender_idTousers   messages[]      @relation("messages_sender_idTousers")
+  messages_messages_receiver_idTousers messages[]       @relation("messages_receiver_idTousers")
+  messages_messages_sender_idTousers   messages[]       @relation("messages_sender_idTousers")
   notifications                        notifications[]
   supervisors                          supervisors?
+  task_reviews                         task_reviews[]
+}
+
+model alembic_version {
+  version_num String @id
+}
+
+model course_reviews {
+  id          Int       @id @default(autoincrement())
+  course_id   Int
+  user_id     Int
+  rating      Int
+  review_text String?
+  is_helpful  Boolean?
+  created_at  DateTime?
+  updated_at  DateTime?
+  users       users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  courses     courses   @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([course_id, user_id], map: "sqlite_autoindex_course_reviews_1")
+}
+
+model task_reviews {
+  id          Int       @id @default(autoincrement())
+  task_id     Int
+  user_id     Int
+  rating      Int
+  review_text String?
+  created_at  DateTime?
+  updated_at  DateTime?
+  users       users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tasks       tasks     @relation(fields: [task_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([task_id, user_id], map: "sqlite_autoindex_task_reviews_1")
 }

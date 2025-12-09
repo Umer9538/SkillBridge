@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import Layout from '../../components/common/Layout'
 import api from '../../utils/api'
-import { Plus, Edit, Trash2, Eye, Clock, DollarSign, Users, Calendar } from 'lucide-react'
-import { format } from 'date-fns'
+import { Plus, Edit, Trash2, Clock, DollarSign, Users, Calendar, AlertCircle } from 'lucide-react'
 
 const TaskManagement = () => {
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [showModal, setShowModal] = useState(false)
   const [editingTask, setEditingTask] = useState(null)
   const [formData, setFormData] = useState({
@@ -33,12 +33,38 @@ const TaskManagement = () => {
 
   const fetchTasks = async () => {
     try {
+      setError(null)
       const response = await api.get('/tasks/my')
       setTasks(response.data.tasks || [])
+    } catch (err) {
+      console.error('Failed to fetch tasks:', err)
+      setError(err.response?.data?.message || 'Failed to fetch tasks')
+    } finally {
       setLoading(false)
-    } catch (error) {
-      console.error('Failed to fetch tasks:', error)
-      setLoading(false)
+    }
+  }
+
+  const formatDate = (dateString) => {
+    if (!dateString) return ''
+    try {
+      const date = new Date(dateString)
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: '2-digit',
+        year: 'numeric'
+      })
+    } catch {
+      return ''
+    }
+  }
+
+  const formatDateForInput = (dateString) => {
+    if (!dateString) return ''
+    try {
+      const date = new Date(dateString)
+      return date.toISOString().split('T')[0]
+    } catch {
+      return ''
     }
   }
 
@@ -63,14 +89,14 @@ const TaskManagement = () => {
   const handleEditTask = (task) => {
     setEditingTask(task)
     setFormData({
-      title: task.title,
-      description: task.description,
-      category: task.category,
-      difficulty: task.difficulty,
+      title: task.title || '',
+      description: task.description || '',
+      category: task.category || 'Programming',
+      difficulty: task.difficulty || 'Beginner',
       skills_required: Array.isArray(task.skills_required) ? task.skills_required.join(', ') : '',
       estimated_hours: task.estimated_hours || '',
       compensation: task.compensation || '',
-      deadline: task.deadline ? format(new Date(task.deadline), 'yyyy-MM-dd') : '',
+      deadline: formatDateForInput(task.deadline),
       requirements: task.requirements || '',
       deliverables: task.deliverables || '',
       max_applicants: task.max_applicants || 5
@@ -100,8 +126,8 @@ const TaskManagement = () => {
 
       setShowModal(false)
       fetchTasks()
-    } catch (error) {
-      alert(error.response?.data?.message || 'Failed to save task')
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to save task')
     }
     setSubmitting(false)
   }
@@ -113,8 +139,8 @@ const TaskManagement = () => {
       await api.delete(`/companies/tasks/${taskId}`)
       alert('Task deleted successfully!')
       fetchTasks()
-    } catch (error) {
-      alert(error.response?.data?.message || 'Failed to delete task')
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to delete task')
     }
   }
 
@@ -130,8 +156,28 @@ const TaskManagement = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </Layout>
+    )
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="flex flex-col items-center justify-center min-h-[60vh]">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center max-w-md">
+            <AlertCircle className="mx-auto text-red-500 mb-3" size={48} />
+            <h2 className="text-lg font-semibold text-red-800 mb-2">Error Loading Tasks</h2>
+            <p className="text-red-600 mb-4">{error}</p>
+            <button
+              onClick={() => { setLoading(true); fetchTasks(); }}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+            >
+              Try Again
+            </button>
+          </div>
         </div>
       </Layout>
     )
@@ -148,7 +194,7 @@ const TaskManagement = () => {
           </div>
           <button
             onClick={handleCreateTask}
-            className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-600 transition-colors"
+            className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus size={20} />
             Post New Task
@@ -173,7 +219,7 @@ const TaskManagement = () => {
                   <div className="flex items-center gap-2 ml-4">
                     <button
                       onClick={() => handleEditTask(task)}
-                      className="p-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg transition-colors"
+                      className="p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors"
                       title="Edit"
                     >
                       <Edit size={20} />
@@ -195,7 +241,7 @@ const TaskManagement = () => {
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Clock size={16} />
-                    <span>{task.estimated_hours}h</span>
+                    <span>{task.estimated_hours || 0}h</span>
                   </div>
                   {task.compensation && (
                     <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -206,7 +252,7 @@ const TaskManagement = () => {
                   {task.deadline && (
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <Calendar size={16} />
-                      <span>{format(new Date(task.deadline), 'MMM dd, yyyy')}</span>
+                      <span>{formatDate(task.deadline)}</span>
                     </div>
                   )}
                 </div>
@@ -218,7 +264,7 @@ const TaskManagement = () => {
                   <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
                     {task.difficulty}
                   </span>
-                  {task.skills_required && task.skills_required.slice(0, 3).map((skill, index) => (
+                  {task.skills_required && Array.isArray(task.skills_required) && task.skills_required.slice(0, 3).map((skill, index) => (
                     <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
                       {skill}
                     </span>
@@ -236,7 +282,7 @@ const TaskManagement = () => {
             </p>
             <button
               onClick={handleCreateTask}
-              className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-600"
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
             >
               Post Your First Task
             </button>
@@ -263,7 +309,7 @@ const TaskManagement = () => {
                       required
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="e.g., Build a Responsive Landing Page"
                     />
                   </div>
@@ -278,7 +324,7 @@ const TaskManagement = () => {
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       rows={4}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Describe the task in detail..."
                     />
                   </div>
@@ -293,7 +339,7 @@ const TaskManagement = () => {
                         required
                         value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
                         {categories.map((cat) => (
                           <option key={cat} value={cat}>
@@ -311,7 +357,7 @@ const TaskManagement = () => {
                         required
                         value={formData.difficulty}
                         onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
                         {difficulties.map((diff) => (
                           <option key={diff} value={diff}>
@@ -331,7 +377,7 @@ const TaskManagement = () => {
                       type="text"
                       value={formData.skills_required}
                       onChange={(e) => setFormData({ ...formData, skills_required: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="e.g., React, JavaScript, CSS (comma separated)"
                     />
                   </div>
@@ -346,7 +392,7 @@ const TaskManagement = () => {
                         type="number"
                         value={formData.estimated_hours}
                         onChange={(e) => setFormData({ ...formData, estimated_hours: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="20"
                       />
                     </div>
@@ -359,7 +405,7 @@ const TaskManagement = () => {
                         type="text"
                         value={formData.compensation}
                         onChange={(e) => setFormData({ ...formData, compensation: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="$500 - $1000"
                       />
                     </div>
@@ -372,7 +418,7 @@ const TaskManagement = () => {
                         type="date"
                         value={formData.deadline}
                         onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
                   </div>
@@ -386,7 +432,7 @@ const TaskManagement = () => {
                       value={formData.requirements}
                       onChange={(e) => setFormData({ ...formData, requirements: e.target.value })}
                       rows={3}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="List specific requirements..."
                     />
                   </div>
@@ -400,7 +446,7 @@ const TaskManagement = () => {
                       value={formData.deliverables}
                       onChange={(e) => setFormData({ ...formData, deliverables: e.target.value })}
                       rows={3}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="What should be delivered..."
                     />
                   </div>
@@ -414,7 +460,7 @@ const TaskManagement = () => {
                       type="number"
                       value={formData.max_applicants}
                       onChange={(e) => setFormData({ ...formData, max_applicants: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="5"
                       min="1"
                     />
@@ -432,7 +478,7 @@ const TaskManagement = () => {
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-600 disabled:opacity-50"
+                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
                     >
                       {submitting ? 'Saving...' : editingTask ? 'Update Task' : 'Create Task'}
                     </button>
