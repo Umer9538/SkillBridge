@@ -340,6 +340,50 @@ def reject_application(app_id):
         return jsonify({'message': f'Failed to reject application: {str(e)}'}), 500
 
 
+@bp.route('/applications/<int:app_id>/status', methods=['PUT'])
+@jwt_required()
+@role_required('company')
+def update_application_status(app_id):
+    """Update application status to any valid status"""
+    try:
+        user = get_current_user()
+        application = Application.query.get(app_id)
+
+        if not application or application.task.company_id != user.company.id:
+            return jsonify({'message': 'Application not found'}), 404
+
+        data = request.get_json()
+        new_status = data.get('status')
+
+        valid_statuses = ['pending', 'accepted', 'rejected', 'in_progress', 'submitted', 'completed']
+        if new_status not in valid_statuses:
+            return jsonify({'message': f'Invalid status. Must be one of: {", ".join(valid_statuses)}'}), 400
+
+        old_status = application.status
+        application.status = new_status
+        db.session.commit()
+
+        # Send email notification to learner if status changed significantly
+        if old_status != new_status and new_status in ['accepted', 'rejected', 'completed']:
+            try:
+                from app.utils.email_service import send_application_status_email
+                from app.models import User
+                learner = User.query.get(application.learner_id)
+                if learner:
+                    send_application_status_email(learner, application.task, new_status, user)
+            except Exception as e:
+                print(f"Failed to send email notification: {str(e)}")
+
+        return jsonify({
+            'message': f'Application status updated to {new_status}',
+            'application': application.to_dict()
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Failed to update application status: {str(e)}'}), 500
+
+
 @bp.route('/tasks/<int:task_id>', methods=['DELETE'])
 @jwt_required()
 @role_required('company')

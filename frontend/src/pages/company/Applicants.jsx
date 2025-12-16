@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Layout from '../../components/common/Layout'
 import api from '../../utils/api'
-import { Eye, Check, X, Users, Filter } from 'lucide-react'
+import { Eye, Check, X, Users, Filter, MoreVertical, PlayCircle, CheckCircle, RotateCcw } from 'lucide-react'
 import { format } from 'date-fns'
 
 const ApplicantsPage = () => {
@@ -13,10 +13,22 @@ const ApplicantsPage = () => {
   const [tasks, setTasks] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState(null)
+  const [openDropdown, setOpenDropdown] = useState(null)
 
   useEffect(() => {
     fetchData()
   }, [])
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (openDropdown && !event.target.closest('.relative')) {
+        setOpenDropdown(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [openDropdown])
 
   const fetchData = async () => {
     try {
@@ -55,6 +67,41 @@ const ApplicantsPage = () => {
     } catch (error) {
       alert(error.response?.data?.message || 'Failed to reject application')
     }
+  }
+
+  const handleStatusChange = async (applicationId, newStatus) => {
+    const statusLabels = {
+      pending: 'Pending',
+      accepted: 'Accepted',
+      rejected: 'Rejected',
+      in_progress: 'In Progress',
+      submitted: 'Submitted',
+      completed: 'Completed'
+    }
+
+    if (!confirm(`Change status to "${statusLabels[newStatus]}"?`)) return
+
+    try {
+      await api.put(`/companies/applications/${applicationId}/status`, { status: newStatus })
+      alert(`Status updated to ${statusLabels[newStatus]}`)
+      setOpenDropdown(null)
+      fetchData()
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to update status')
+    }
+  }
+
+  const getAvailableStatusOptions = (currentStatus) => {
+    // Define what status transitions are allowed
+    const statusOptions = {
+      pending: ['accepted', 'rejected'],
+      accepted: ['in_progress', 'completed', 'rejected', 'pending'],
+      in_progress: ['submitted', 'completed', 'accepted'],
+      submitted: ['completed', 'in_progress', 'rejected'],
+      completed: ['in_progress'],
+      rejected: ['pending', 'accepted']
+    }
+    return statusOptions[currentStatus] || []
   }
 
   const handleViewDetails = (application) => {
@@ -233,6 +280,42 @@ const ApplicantsPage = () => {
                               </button>
                             </>
                           )}
+                          {/* Status change dropdown for non-pending statuses */}
+                          {app.status !== 'pending' && (
+                            <div className="relative">
+                              <button
+                                onClick={() => setOpenDropdown(openDropdown === app.id ? null : app.id)}
+                                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                                title="Change Status"
+                              >
+                                <MoreVertical size={18} />
+                              </button>
+                              {openDropdown === app.id && (
+                                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                                  <div className="py-1">
+                                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">
+                                      Change Status To
+                                    </div>
+                                    {getAvailableStatusOptions(app.status).map((status) => (
+                                      <button
+                                        key={status}
+                                        onClick={() => handleStatusChange(app.id, status)}
+                                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                                      >
+                                        {status === 'accepted' && <Check size={14} className="text-green-600" />}
+                                        {status === 'rejected' && <X size={14} className="text-red-600" />}
+                                        {status === 'pending' && <RotateCcw size={14} className="text-yellow-600" />}
+                                        {status === 'in_progress' && <PlayCircle size={14} className="text-purple-600" />}
+                                        {status === 'completed' && <CheckCircle size={14} className="text-green-600" />}
+                                        {status === 'submitted' && <Check size={14} className="text-indigo-600" />}
+                                        <span className="capitalize">{status.replace('_', ' ')}</span>
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -319,35 +402,52 @@ const ApplicantsPage = () => {
                 </div>
 
                 {/* Actions */}
-                <div className="flex justify-end gap-3 mt-6 pt-6 border-t">
-                  <button
-                    onClick={() => setShowModal(false)}
-                    className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                  >
-                    Close
-                  </button>
-                  {selectedApplication.status === 'pending' && (
-                    <>
-                      <button
-                        onClick={() => {
-                          handleReject(selectedApplication.id)
-                          setShowModal(false)
-                        }}
-                        className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                      >
-                        Reject
-                      </button>
-                      <button
-                        onClick={() => {
-                          handleAccept(selectedApplication.id)
-                          setShowModal(false)
-                        }}
-                        className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                      >
-                        Accept
-                      </button>
-                    </>
+                <div className="mt-6 pt-6 border-t">
+                  {/* Status change options */}
+                  {getAvailableStatusOptions(selectedApplication.status).length > 0 && (
+                    <div className="mb-4">
+                      <h3 className="text-sm font-semibold text-gray-700 mb-3">Change Status</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {getAvailableStatusOptions(selectedApplication.status).map((status) => {
+                          const buttonStyles = {
+                            accepted: 'bg-green-100 text-green-700 hover:bg-green-200',
+                            rejected: 'bg-red-100 text-red-700 hover:bg-red-200',
+                            pending: 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200',
+                            in_progress: 'bg-purple-100 text-purple-700 hover:bg-purple-200',
+                            submitted: 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200',
+                            completed: 'bg-green-100 text-green-700 hover:bg-green-200'
+                          }
+                          return (
+                            <button
+                              key={status}
+                              onClick={() => {
+                                handleStatusChange(selectedApplication.id, status)
+                                setShowModal(false)
+                              }}
+                              className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 ${buttonStyles[status]}`}
+                            >
+                              {status === 'accepted' && <Check size={16} />}
+                              {status === 'rejected' && <X size={16} />}
+                              {status === 'pending' && <RotateCcw size={16} />}
+                              {status === 'in_progress' && <PlayCircle size={16} />}
+                              {status === 'completed' && <CheckCircle size={16} />}
+                              {status === 'submitted' && <Check size={16} />}
+                              <span className="capitalize">{status.replace('_', ' ')}</span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
                   )}
+
+                  <div className="flex justify-end">
+                    <button
+                      onClick={() => setShowModal(false)}
+                      className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                    >
+                      Close
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
